@@ -16,7 +16,7 @@
       "gridPos": { "x": 0, "y": 0, "w": 6, "h": 6 },
       "targets": [
         {
-          "expr": "sum(temporal_workflow_active{namespace=\"default\"})",
+          "expr": "sum(temporal_workflow_active{namespace=\"zenarc\"})",
           "legendFormat": "Active"
         }
       ],

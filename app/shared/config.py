@@ -3,10 +3,13 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    temporal_host: str = Field(default="localhost:7233")
+    # Temporal — unauthenticated HTTP API via internal FQDN
+    temporal_base_url: str = Field(default="")
     temporal_namespace: str = Field(default="default")
 
     phoenix_host: str = Field(default="http://localhost:6006")
+    phoenix_api_key: str = Field(default="")
+
 
     azure_subscription_id: str = Field(default="")
     azure_tenant_id: str = Field(default="")

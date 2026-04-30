@@ -19,7 +19,7 @@ datasources:
     access: proxy
     editable: false
     jsonData:
-      baseURL: http://host.containers.internal:6006
+      baseURL: http://phoenix:6006
       allowedHosts:
-        - http://host.containers.internal:6006
+        - http://phoenix:6006
 
