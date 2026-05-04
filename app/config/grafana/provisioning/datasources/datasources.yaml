@@ -19,7 +19,10 @@ datasources:
     access: proxy
     editable: false
     jsonData:
-      baseURL: http://phoenix:6006
+      baseURL: ${PHOENIX_BASE_URL:-http://phoenix:6006}
       allowedHosts:
-        - http://phoenix:6006
+        - ${PHOENIX_BASE_URL:-http://phoenix:6006}
+      httpHeaderName1: "Authorization"
+    secureJsonData:
+      httpHeaderValue1: "Bearer ${PHOENIX_API_KEY:-}"
 

@@ -1,4 +1,3 @@
-import httpx
 from fastapi import APIRouter
 from pydantic import BaseModel
 
@@ -9,7 +8,6 @@ from app.observability.kpi_metrics import (
     _memory_usage,
 )
 from app.observability.phoenix import _drift_score
-from app.shared.config import settings
 from app.shared.logger import logger
 
 router = APIRouter(prefix="/observability", tags=["observability"])
@@ -30,7 +28,6 @@ class MetricValue(BaseModel):
 
 class MetricsResponse(BaseModel):
     system: list[MetricValue]
-    phoenix: dict
 
 
 class AlertItem(BaseModel):
@@ -86,16 +83,7 @@ async def get_metrics() -> MetricsResponse:
                     )
                 )
 
-    phoenix_data: dict = {}
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.get(f"{settings.phoenix_host}/v1/model/performance")
-            response.raise_for_status()
-            phoenix_data = response.json()
-    except Exception as exc:
-        logger.warning("Metrics endpoint — Phoenix fetch failed: %s", exc)
-
-    return MetricsResponse(system=system_metrics, phoenix=phoenix_data)
+    return MetricsResponse(system=system_metrics)
 
 
 @router.get("/alerts", response_model=AlertsResponse)

@@ -53,20 +53,20 @@
       "id": 3,
       "title": "P50 / P95 / P99 Latency per Stage",
       "type": "timeseries",
-      "datasource": { "uid": "phoenix-ds", "type": "yesoreyeram-infinity-datasource" },
+      "datasource": { "uid": "prometheus-ds", "type": "prometheus" },
       "gridPos": { "x": 0, "y": 10, "w": 24, "h": 10 },
       "targets": [
         {
-          "refId": "A",
-          "type": "json",
-          "url": "/v1/traces/latency_percentiles",
-          "root_selector": "data",
-          "columns": [
-            { "selector": "stage", "text": "Stage", "type": "string" },
-            { "selector": "p50", "text": "p50 (ms)", "type": "number" },
-            { "selector": "p95", "text": "p95 (ms)", "type": "number" },
-            { "selector": "p99", "text": "p99 (ms)", "type": "number" }
-          ]
+          "expr": "histogram_quantile(0.50, sum(rate(otelcol_processor_batch_timeout_trigger_send_bucket[5m])) by (le))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(otelcol_processor_batch_timeout_trigger_send_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(otelcol_processor_batch_timeout_trigger_send_bucket[5m])) by (le))",
+          "legendFormat": "p99"
         }
       ],
       "fieldConfig": {

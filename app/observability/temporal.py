@@ -34,20 +34,22 @@ _activity_task_error = Gauge(
 @dataclass
 class TemporalConfig:
     base_url: str
-    namespace: str
+    namespaces: list[str]
 
     @classmethod
     def from_env(cls) -> "TemporalConfig":
+        namespaces_str = os.environ.get("TEMPORAL_NAMESPACES", "default")
+        namespaces = [ns.strip() for ns in namespaces_str.split(",") if ns.strip()]
         return cls(
             base_url=os.environ.get("TEMPORAL_BASE_URL", "").rstrip("/"),
-            namespace=os.environ.get("TEMPORAL_NAMESPACE", "default"),
+            namespaces=namespaces,
         )
 
 
 class TemporalMetricsCollector:
     def __init__(self, config: TemporalConfig) -> None:
         self._base_url = config.base_url
-        self._namespace = config.namespace
+        self._namespaces = config.namespaces
 
     async def _get(self, client: httpx.AsyncClient, path: str, params: dict | None = None) -> dict | None:
         try:
@@ -62,10 +64,10 @@ class TemporalMetricsCollector:
             logger.warning("Temporal API call failed: %s — %s", path, exc)
             return None
 
-    async def _count_status(self, client: httpx.AsyncClient, status: str) -> int:
+    async def _count_status(self, client: httpx.AsyncClient, namespace: str, status: str) -> int:
         data = await self._get(
             client,
-            f"/api/v1/namespaces/{self._namespace}/workflows",
+            f"/api/v1/namespaces/{namespace}/workflows",
             params={"pageSize": _PAGE_SIZE, "query": f"ExecutionStatus='{status}'"},
         )
         if data is None:
@@ -78,25 +80,25 @@ class TemporalMetricsCollector:
             return
 
         async with httpx.AsyncClient() as client:
-            ns = self._namespace
-            running, completed, failed, timed_out, canceled = await asyncio.gather(
-                self._count_status(client, "Running"),
-                self._count_status(client, "Completed"),
-                self._count_status(client, "Failed"),
-                self._count_status(client, "TimedOut"),
-                self._count_status(client, "Canceled"),
-            )
+            for ns in self._namespaces:
+                running, completed, failed, timed_out, canceled = await asyncio.gather(
+                    self._count_status(client, ns, "Running"),
+                    self._count_status(client, ns, "Completed"),
+                    self._count_status(client, ns, "Failed"),
+                    self._count_status(client, ns, "TimedOut"),
+                    self._count_status(client, ns, "Canceled"),
+                )
 
-            _workflow_active.labels(namespace=ns).set(running)
-            _workflow_completed.labels(namespace=ns).set(completed)
-            _workflow_failed.labels(namespace=ns).set(failed)
-            _workflow_timed_out.labels(namespace=ns).set(timed_out)
-            _workflow_canceled.labels(namespace=ns).set(canceled)
+                _workflow_active.labels(namespace=ns).set(running)
+                _workflow_completed.labels(namespace=ns).set(completed)
+                _workflow_failed.labels(namespace=ns).set(failed)
+                _workflow_timed_out.labels(namespace=ns).set(timed_out)
+                _workflow_canceled.labels(namespace=ns).set(canceled)
 
-            logger.debug(
-                "Temporal [%s] running=%d completed=%d failed=%d timedout=%d canceled=%d",
-                ns, running, completed, failed, timed_out, canceled,
-            )
+                logger.debug(
+                    "Temporal [%s] running=%d completed=%d failed=%d timedout=%d canceled=%d",
+                    ns, running, completed, failed, timed_out, canceled,
+                )
 
 
 async def _collection_loop(collector: TemporalMetricsCollector) -> None:

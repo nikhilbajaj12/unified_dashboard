@@ -21,8 +21,8 @@ policies:
 
 rules:
   - orgId: 1
-    name: poc-alert-rules
-    folder: POC Alerts
+    name: unified-alert-rules
+    folder: Unified Alerts
     interval: 1m
     rules:
       - uid: drift-alert

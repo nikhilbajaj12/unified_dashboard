@@ -12,7 +12,7 @@ from opentelemetry.trace import Span, Tracer
 from app.shared.logger import logger
 
 
-def setup_tracing(service_name: str = "poc-dashboard") -> TracerProvider:
+def setup_tracing(service_name: str = "unified-dashboard") -> TracerProvider:
     otlp_endpoint = os.environ.get("PHOENIX_OTLP_ENDPOINT", "http://localhost:4317")
 
     resource = Resource.create({"service.name": service_name})

@@ -14,10 +14,10 @@ services:
       - PHOENIX_OTLP_ENDPOINT=${PHOENIX_OTLP_ENDPOINT:-http://phoenix:4317}
       - PHOENIX_API_KEY=${PHOENIX_API_KEY:-}
       - TEMPORAL_BASE_URL=${TEMPORAL_BASE_URL:-}
-      - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
+      - TEMPORAL_NAMESPACES=${TEMPORAL_NAMESPACES:-}
       - METRICS_PORT=8001
     networks:
-      - poc-network
+      - unified-network
     depends_on:
       - phoenix
     restart: unless-stopped
@@ -32,7 +32,7 @@ services:
     volumes:
       - phoenix_db_data:/var/lib/postgresql/data
     networks:
-      - poc-network
+      - unified-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U phoenix"]
       interval: 5s
@@ -52,7 +52,7 @@ services:
       phoenix-db:
         condition: service_healthy
     networks:
-      - poc-network
+      - unified-network
     restart: unless-stopped
 
   prometheus:
@@ -68,7 +68,7 @@ services:
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=15d"
     networks:
-      - poc-network
+      - unified-network
     restart: unless-stopped
 
   grafana:
@@ -84,17 +84,19 @@ services:
       - GF_UNIFIED_ALERTING_ENABLED=true
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
       - TEAMS_WEBHOOK_URL=${TEAMS_WEBHOOK_URL:-}
+      - PHOENIX_BASE_URL=${PHOENIX_BASE_URL:-}
+      - PHOENIX_API_KEY=${PHOENIX_API_KEY:-}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./app/config/grafana/provisioning:/etc/grafana/provisioning:ro
     networks:
-      - poc-network
+      - unified-network
     depends_on:
       - prometheus
     restart: unless-stopped
 
 networks:
-  poc-network:
+  unified-network:
     driver: bridge
 
 volumes:

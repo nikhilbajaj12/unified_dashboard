@@ -1,0 +1,17 @@
+logger=ngalert.state.manager t=2026-05-04T08:15:03.024075051Z level=info 
+msg="Running in alternative execution of Error/NoData mode"
+logger=provisioning.plugins t=2026-05-04T08:15:03.213157108Z level=error 
+msg="Failed to read plugin provisioning files from directory" 
+path=/etc/grafana/provisioning/plugins error="open 
+/etc/grafana/provisioning/plugins: no such file or directory"
+logger=provisioning.notifiers t=2026-05-04T08:15:03.217559466Z level=error 
+msg="Can't read alert notification provisioning files from directory" 
+path=/etc/grafana/provisioning/notifiers error="open 
+/etc/grafana/provisioning/notifiers: no such file or directory"
+logger=provisioning.dashboard t=2026-05-04T08:15:03.56462877Z level=info 
+msg="starting to provision dashboards"
+logger=provisioning.dashboard t=2026-05-04T08:15:03.871844533Z level=info 
+msg="finished to provision dashboards"
+logger=live t=2026-05-04T08:15:21.384430032Z level=info msg="Initialized 
+channel handler" channel=grafana/dashboard/uid/workflow-execution 
+address=grafana/dashboard/uid/workflow-execution

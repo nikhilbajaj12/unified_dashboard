@@ -25,7 +25,7 @@ async def _main() -> None:
 
     logger.info("System metrics collector scheduled")
     logger.info("Phoenix metrics collector scheduled, target: %s", phoenix_config.base_url)
-    logger.info("Temporal metrics collector scheduled, target: %s / ns: %s", temporal_config.base_url, temporal_config.namespace)
+    logger.info("Temporal metrics collector scheduled, target: %s / ns: %s", temporal_config.base_url, temporal_config.namespaces)
 
     await asyncio.gather(
         system_loop(system_collector),

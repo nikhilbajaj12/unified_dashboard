@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     # Temporal — unauthenticated HTTP API via internal FQDN
     temporal_base_url: str = Field(default="")
-    temporal_namespace: str = Field(default="default")
+    temporal_namespaces: str = Field(default="default")
 
     phoenix_host: str = Field(default="http://localhost:6006")
     phoenix_api_key: str = Field(default="")
